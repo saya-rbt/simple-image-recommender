@@ -2,6 +2,7 @@
 #
 # required:
 # data/images: a folder containing your images dataset
+# data/users: can be empty, but the folder needs to exist (for now ?)
 # 
 # optional:
 # data/tags.csv: a comma-separated list containing the names of your 
@@ -37,7 +38,7 @@ def user_data_gathering():
 	if do_fav == "y":
 		user_favs = input("Please enter your favourite images, separated by a comma: ").split(",")
 	elif do_fav == "a":
-		user_favs.append(input("Please enter the images you want to add, separated by a comma: ").split(","))
+		user_favs += input("Please enter the images you want to add, separated by a comma: ").split(",")
 	elif do_fav == "n":
 		pass
 	else:
@@ -46,16 +47,20 @@ def user_data_gathering():
 	if do_dislike == "y":
 		user_dislikes = input("Please enter your disliked images, separated by a comma: ").split(",")
 	elif do_dislike == "a":
-		user_dislikes.append(input("Please enter the images you want to add, separated by a comma: ").split(","))
+		user_dislikes += input("Please enter the images you want to add, separated by a comma: ").split(",")
 	elif do_dislike == "n":
 		pass
 	else:
 		print("Incorrect choice. Exiting")
-	# print(user_favs)
-	# print(user_dislikes)
-	with open("data/users/" + name + ".txt", "w+") as userfile:
-		userfile.write(",".join(user_favs) + "\n")
-		userfile.write(",".join(user_dislikes) + "\n")
+	print(user_favs)
+	print(user_dislikes)
+
+	userfile = open("data/users/" + name + ".txt", "w+")
+	userfile.write(",".join(user_favs) + "\n")
+	userfile.write(",".join(user_dislikes) + "\n")
+	userfile.close()
+
+	return user_favs,user_dislikes
 
 
 # Get all images filenames in data/images/
@@ -113,14 +118,14 @@ def main():
 	imagelist = get_image_list()
 	print(" -- Calculating color clusters (this can take some time)...")
 	n_clusters = 4
-	clusters = {filename:get_clusters(filename, n_clusters) for filename in imagelist}
+	# clusters = {filename:get_clusters(filename, n_clusters) for filename in imagelist}
 	print(" -- Extracting tags...")
 	tags = get_tags("data/tags.csv")
 	print("Loading done!")
 
 	# Gathering user data
 	print("Gathering user data...")
-	user_data_gathering()
+	(user_favs, user_dislikes) = user_data_gathering()
 
 	# Recommendation system
 	print("Computing recommendation...")
