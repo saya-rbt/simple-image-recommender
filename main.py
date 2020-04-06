@@ -52,8 +52,6 @@ def user_data_gathering():
 		pass
 	else:
 		print("Incorrect choice. Exiting")
-	print(user_favs)
-	print(user_dislikes)
 
 	userfile = open("data/users/" + name + ".txt", "w+")
 	userfile.write(",".join(user_favs) + "\n")
@@ -118,7 +116,7 @@ def main():
 	imagelist = get_image_list()
 	print(" -- Calculating color clusters (this can take some time)...")
 	n_clusters = 4
-	# clusters = {filename:get_clusters(filename, n_clusters) for filename in imagelist}
+	clusters = {filename:get_clusters(filename, n_clusters) for filename in imagelist}
 	print(" -- Extracting tags...")
 	tags = get_tags("data/tags.csv")
 	print("Loading done!")
