@@ -18,6 +18,7 @@ import pandas as pd
 import json
 import math
 import os
+import json
 
 # User data gathering
 def user_data_gathering():
@@ -109,6 +110,24 @@ def get_tags(filename):
 	tags_df["tags"] = tags_df.tags.str.split(";")
 	return tags_df
 
+def clean_data(imagelist, clusters):
+	for image in imagelist:
+		tmp = []
+		tups = clusters[image]
+		print(tups)
+		for tup in tups: 
+			print(tup)
+			print(((tup[0])<<16)|((tup[1])<<8)|(tup[2]))
+			tmp.append(((tup[0])<<16)|((tup[1])<<8)|(tup[2]))
+			print(tmp)
+		clusters[image] = tmp
+		tmp = []
+		print(clusters[image])
+
+	print("Test \n")
+	print(clusters["1.png"])
+	print(clusters)
+	
 # Main function
 def main():
 	print("Loading...")
@@ -125,8 +144,15 @@ def main():
 	print("Gathering user data...")
 	(user_favs, user_dislikes) = user_data_gathering()
 
+	r = json.dumps(clusters)
+	clusersfile = open("data/clusters.txt", "w")
+	clusersfile.write(r)
+	clusersfile.close()
+
 	# Recommendation system
 	print("Computing recommendation...")
+	clean_data(imagelist, clusters)
+
 	# TODO
 
 main()
