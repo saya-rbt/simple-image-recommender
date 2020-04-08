@@ -13,12 +13,16 @@
 from PIL import Image
 from sklearn.cluster import MiniBatchKMeans
 from operator import itemgetter
+import pandas
+from sklearn.ensemble import RandomForestClassifier
 import numpy as np
 import pandas as pd
 import json
 import math
 import os
 import json
+
+
 
 # User data gathering
 def user_data_gathering():
@@ -60,7 +64,6 @@ def user_data_gathering():
 	userfile.close()
 
 	return user_favs,user_dislikes
-
 
 # Get all images filenames in data/images/
 def get_image_list():
@@ -110,24 +113,50 @@ def get_tags(filename):
 	tags_df["tags"] = tags_df.tags.str.split(";")
 	return tags_df
 
-def clean_data(imagelist, clusters):
-	for image in imagelist:
+def clean_data(clusters):
+	for image in clusters:
 		tmp = []
-		tups = clusters[image]
-		print(tups)
-		for tup in tups: 
-			print(tup)
-			print(((tup[0])<<16)|((tup[1])<<8)|(tup[2]))
-			tmp.append(((tup[0])<<16)|((tup[1])<<8)|(tup[2]))
-			print(tmp)
-		clusters[image] = tmp
+		image["colors"].pop(3)
+		for color in image["colors"]: 
+			tmp.append(((color[0])<<16)|((color[1])<<8)|(color[2]))
+		image["colors"] = tmp
 		tmp = []
-		print(clusters[image])
+		print(image)
 
-	print("Test \n")
-	print(clusters["1.png"])
 	print(clusters)
+	return clusters
+
+def predict(clusters):
+	images = sorted(clusters, key=lambda x: x['name'])
+	color_clusters = [image["colors"] for image in images]
+	user_fav = ["12.png", "118.png", "119.png", "266.png"]
+
+	# Build training data
+	training_data = color_clusters
+	result_data = [(image['name'] in user_fav) for image in images]
 	
+	# Build dataframes
+	training_df = pandas.DataFrame(training_data, columns=['color1', 'color2', 'color3'])
+	result_df = pandas.DataFrame(result_data, columns=['favorite'])
+	print(training_df)
+	print(result_df)
+
+	# Train decision tree
+	classifier = RandomForestClassifier(n_estimators=10, max_depth=10)
+	classifier = classifier.fit(training_df, result_df.values.ravel())
+	print(list(map(lambda x: x['colors'], images)))
+	predicted = classifier.predict(list(map(lambda x: x['colors'], images)))
+	print(predicted)
+	print("# Predicted as favorites")
+
+	for index, favorite in enumerate(predicted):
+		name = images[index]['name']
+		# Only print new images
+		if favorite:
+			print(name)
+			if name not in user_fav:
+				print("not in fav " + name)
+
 # Main function
 def main():
 	print("Loading...")
@@ -135,23 +164,27 @@ def main():
 	imagelist = get_image_list()
 	print(" -- Calculating color clusters (this can take some time)...")
 	n_clusters = 4
-	clusters = {filename:get_clusters(filename, n_clusters) for filename in imagelist}
+
+	"""clusters = [{"name":filename, "colors":get_clusters(filename, n_clusters)} for filename in imagelist]
+	r = json.dumps(clusters)
+	clusersfile = open("data/clusters.txt", "w")
+	clusersfile.write(r)
+	clusersfile.close()"""
+
+	clustersData = open("data/clusters.json", "r")
+	clusters = json.load(clustersData)
 	print(" -- Extracting tags...")
 	tags = get_tags("data/tags.csv")
 	print("Loading done!")
 
 	# Gathering user data
 	print("Gathering user data...")
-	(user_favs, user_dislikes) = user_data_gathering()
-
-	r = json.dumps(clusters)
-	clusersfile = open("data/clusters.txt", "w")
-	clusersfile.write(r)
-	clusersfile.close()
+	#(user_favs, user_dislikes) = user_data_gathering()
 
 	# Recommendation system
 	print("Computing recommendation...")
-	clean_data(imagelist, clusters)
+	cleanedclusters = clean_data(clusters)
+	predict(cleanedclusters)
 
 	# TODO
 
