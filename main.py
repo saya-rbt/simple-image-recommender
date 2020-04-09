@@ -125,7 +125,7 @@ def clean_data(clusters):
 
 	return clusters
 
-def predict(clusters, user_fav):
+def predict(clusters, user_fav, user_dislikes):
 	images = sorted(clusters, key=lambda x: x['name'])
 	color_clusters = [image["colors"] for image in images]
 
@@ -151,7 +151,7 @@ def predict(clusters, user_fav):
 	for index, favorite in enumerate(predicted):
 		name = images[index]['name']
 		# Only print new images
-		if favorite and name not in user_fav:
+		if favorite and name not in user_fav and name not in user_dislikes:
 			print(name)
 
 # Main function
@@ -174,15 +174,17 @@ def main():
 
 	print(" -- Extracting tags...")
 	tags = get_tags("data/tags.csv")
+	print(tags["tags"])
 	print("Loading done!")
 
 	# Gathering user data
 	print("Gathering user data...")
 	(user_favs, user_dislikes) = user_data_gathering()
+	print(user_favs)
 
 	# Recommendation system
 	print("Computing recommendation...")
 	cleanedclusters = clean_data(clusters)
-	predict(cleanedclusters, user_favs)
+	predict(cleanedclusters, user_favs, user_dislikes)
 
 main()
