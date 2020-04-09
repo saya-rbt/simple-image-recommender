@@ -48,6 +48,8 @@ def user_data_gathering():
 		pass
 	else:
 		print("Incorrect choice. Exiting")
+		exit()
+
 	do_dislike = input("Would you like to define your disliked images? ([y]es/[n]o/[a]dd): ")
 	if do_dislike == "y":
 		user_dislikes = input("Please enter your disliked images, separated by a comma: ").split(",")
@@ -57,7 +59,7 @@ def user_data_gathering():
 		pass
 	else:
 		print("Incorrect choice. Exiting")
-
+		exit()
 	userfile = open("data/users/" + name + ".txt", "w+")
 	userfile.write(",".join(user_favs) + "\n")
 	userfile.write(",".join(user_dislikes) + "\n")
@@ -120,15 +122,12 @@ def clean_data(clusters):
 			tmp.append(((color[0])<<16)|((color[1])<<8)|(color[2]))
 		image["colors"] = tmp
 		tmp = []
-		print(image)
 
-	print(clusters)
 	return clusters
 
-def predict(clusters):
+def predict(clusters, user_fav):
 	images = sorted(clusters, key=lambda x: x['name'])
 	color_clusters = [image["colors"] for image in images]
-	user_fav = ["12.png", "118.png", "119.png", "266.png"]
 
 	# Build training data
 	training_data = color_clusters
@@ -137,24 +136,23 @@ def predict(clusters):
 	# Build dataframes
 	training_df = pandas.DataFrame(training_data, columns=['color1', 'color2', 'color3'])
 	result_df = pandas.DataFrame(result_data, columns=['favorite'])
-	print(training_df)
-	print(result_df)
+
+	#training_df["tags"] = tags["tags"]
+	#print(training_df)
 
 	# Train decision tree
 	classifier = RandomForestClassifier(n_estimators=10, max_depth=10)
 	classifier = classifier.fit(training_df, result_df.values.ravel())
-	print(list(map(lambda x: x['colors'], images)))
+
 	predicted = classifier.predict(list(map(lambda x: x['colors'], images)))
-	print(predicted)
+
 	print("# Predicted as favorites")
 
 	for index, favorite in enumerate(predicted):
 		name = images[index]['name']
 		# Only print new images
-		if favorite:
+		if favorite and name not in user_fav:
 			print(name)
-			if name not in user_fav:
-				print("not in fav " + name)
 
 # Main function
 def main():
@@ -180,13 +178,11 @@ def main():
 
 	# Gathering user data
 	print("Gathering user data...")
-	#(user_favs, user_dislikes) = user_data_gathering()
+	(user_favs, user_dislikes) = user_data_gathering()
 
 	# Recommendation system
 	print("Computing recommendation...")
 	cleanedclusters = clean_data(clusters)
-	predict(cleanedclusters)
-
-	# TODO
+	predict(cleanedclusters, user_favs)
 
 main()
