@@ -137,9 +137,6 @@ def predict(clusters, user_fav, user_dislikes):
 	training_df = pandas.DataFrame(training_data, columns=['color1', 'color2', 'color3'])
 	result_df = pandas.DataFrame(result_data, columns=['favorite'])
 
-	#training_df["tags"] = tags["tags"]
-	#print(training_df)
-
 	# Train decision tree
 	classifier = RandomForestClassifier(n_estimators=10, max_depth=10)
 	classifier = classifier.fit(training_df, result_df.values.ravel())
@@ -174,13 +171,11 @@ def main():
 
 	print(" -- Extracting tags...")
 	tags = get_tags("data/tags.csv")
-	print(tags["tags"])
 	print("Loading done!")
 
 	# Gathering user data
 	print("Gathering user data...")
 	(user_favs, user_dislikes) = user_data_gathering()
-	print(user_favs)
 
 	# Recommendation system
 	print("Computing recommendation...")
