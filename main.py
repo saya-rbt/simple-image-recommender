@@ -21,7 +21,7 @@ import json
 import math
 import os
 import json
-
+import csv
 
 
 # User data gathering
@@ -116,7 +116,6 @@ def get_tags(filename):
 def clean_data(clusters):
 	for image in clusters:
 		tmp = []
-		image["colors"].pop(3)
 		for color in image["colors"]: 
 			tmp.append(((color[0])<<16)|((color[1])<<8)|(color[2]))
 		image["colors"] = tmp
@@ -163,16 +162,18 @@ def main():
 	print(" -- Looking up images...")
 	imagelist = get_image_list()
 	print(" -- Calculating color clusters (this can take some time)...")
-	n_clusters = 4
+	n_clusters = 3
 
-	"""clusters = [{"name":filename, "colors":get_clusters(filename, n_clusters)} for filename in imagelist]
-	r = json.dumps(clusters)
-	clusersfile = open("data/clusters.txt", "w")
-	clusersfile.write(r)
-	clusersfile.close()"""
+	try:
+		clustersData = open("data/clusters.json", "r")
+		clusters = json.load(clustersData)
+	except:
+		clusters = [{"name":filename, "colors":get_clusters(filename, n_clusters)} for filename in imagelist]
+		r = json.dumps(clusters)
+		clusersfile = open("data/clusters.json", "w")
+		clusersfile.write(r)
+		clusersfile.close()
 
-	clustersData = open("data/clusters.json", "r")
-	clusters = json.load(clustersData)
 	print(" -- Extracting tags...")
 	tags = get_tags("data/tags.csv")
 	print("Loading done!")
