@@ -1,5 +1,7 @@
 # Simple image recommender
 
+A simple school project where we use data mining to recommend images to an user based on the one they like. Released under MIT.
+
 ## Goal of the project
 
 The goal of the project is to have a user select their favourite images out of any dataset. The program is merely a PoC, and is simply an exercise about how to use CSV files as `pandas` dataframes, how to get color clusters from image files with `PIL`, `numpy` and `sklearn`, and how to predict similar images using machine learning with `sklearn`. The code is made to be as modular and adaptable as possible, as long as you fit the following requirements:
@@ -16,7 +18,7 @@ The goal of the project is to have a user select their favourite images out of a
 	...
 	```
 
-## Data sources of your training images and licence
+## Data sources of our training images
 
 We obviously needed an image dataset in order to base our program on. We decided to go with Pokémons images and we used their types as the tags/labels, that we already described in the `tags.csv` description above.
 
@@ -27,7 +29,7 @@ We didn't ask our users to label the images out of convenience too, though we do
 ## Machine learning models that you tested and used as well as their precision
 
 In order to predict the images the user is likely to like, we used a `RandomForestClassifier`. There are two reasons behind that decision:
-* It fit our needs of using our color clusters to predict the images likely to be liked pretty well, and
+* It fits our needs of using our color clusters to predict the images likely to be liked pretty well, and
 * We were already familiar with it.
 
 ![Random forest classifier](https://miro.medium.com/max/5752/1*5dq_1hnqkboZTcKFfwbO9A.png)
@@ -53,9 +55,9 @@ The user then has the choice to either overwrite their preferences, edit them, o
 
 The user profile is stored this way: the first line is a comma-separated list containing the user's favourite images, and the second one is also a comma-separated list except it contains the user's disliked images. We will use the latter in order to predict the user's preferences more accurately, and not recommend images to the user if the user already dislikes them.
 
-## Self-evaluation of your work, remarks and scope for improvement
+## Self-evaluation of our work, remarks and scope for improvement
 
-In my honest opinion, this is still very rudimentary. Though we do have sometimes accurate predictions when using a big enough testing dataset (we regularly have the picture `151.png` recommended when we put the 150 first Pokémons as test set, meaning the last Pokémon of the first generation is likely to be liked by the user), the program could recommend more images (we end up with around 4-5 recommendations out of 571 images). There is plenty of room for improvement, but unfortunately due to our lack of time and knowledge on the topic this is around the best we can do. Maybe more classes on the topic of machine learning/documentation could've been useful, but it's the best we did regarding the situation.
+In our honest opinion, this is still very rudimentary. Though we do have sometimes accurate predictions when using a big enough testing dataset (we regularly have the picture `151.png` recommended when we put the 150 first Pokémons as test set, meaning the last Pokémon of the first generation is likely to be liked by the user), the program could recommend more images (we end up with around 4-5 recommendations out of 571 images). There is plenty of room for improvement, but unfortunately due to our lack of time and knowledge on the topic this is around the best we can do. Maybe more classes on the topic of machine learning/documentation could've been useful, but it's the best we did regarding the situation.
 
 There are also plenty of uncaught exceptions and bugs here and there regarding the user input handling, but again this is mostly due to the lack of time. More work on this program could definitely have resulted in a more polished final result, but as it's merely a PoC, we decided to focus more on the functionalities themselves at first.
 

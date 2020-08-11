@@ -115,6 +115,7 @@ def get_tags(filename):
 	tags_df["tags"] = tags_df.tags.str.split(";")
 	return tags_df
 
+# Clean the clusters data
 def clean_data(clusters):
 	for image in clusters:
 		tmp = []
@@ -125,6 +126,7 @@ def clean_data(clusters):
 
 	return clusters
 
+# The actual prediction algorithm
 def predict(clusters, user_fav, user_dislikes):
 	images = sorted(clusters, key=lambda x: x['name'])
 	color_clusters = [image["colors"] for image in images]
@@ -156,7 +158,7 @@ def main():
 	print("Loading...")
 	print(" -- Looking up images...")
 	imagelist = get_image_list()
-	print(" -- Calculating color clusters (this can take some time)...")
+	print(" -- Calculating color clusters (this can take some time if it has never been done before)...")
 	n_clusters = 3
 
 	try:
@@ -182,4 +184,5 @@ def main():
 	cleanedclusters = clean_data(clusters)
 	predict(cleanedclusters, user_favs, user_dislikes)
 
-main()
+if __name__ == "__main__":
+	main()
